@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HydroElectric Saviour</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>⚡ HydroElectric Saviour</h1>
+  <p>Detect unsafe EMF levels in water or metal using Bluetooth</p>
+
+  <!-- Mode Buttons -->
+  <button class="btn" onclick="connectBluetooth()">🔗 Connect to Sensor</button><br>
+  <button class="btn" onclick="setMode(1)">🌩️ Road Mode</button>
+  <button class="btn" onclick="setMode(2)">🚿 Heater Mode</button>
+  <button class="btn" onclick="setMode(3)">🔋 Battery Test</button>
+
+  <!-- Output Display -->
+  <div class="status-box">
+    <div class="output">🔧 Mode Threshold: <span id="mode-info">200</span></div>
+    <div class="output">📶 Status: <span id="status">Not Connected</span></div>
+    <div class="output">📟 EMF Reading: <span id="reading">--</span></div>
+    <div class="output">🚨 Alert: <span id="alert">None</span></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
