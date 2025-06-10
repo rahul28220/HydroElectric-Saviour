@@ -5,7 +5,7 @@ let modeThreshold = 200;
 function setMode(mode) {
   if (mode === 1) modeThreshold = 200;
   else if (mode === 2) modeThreshold = 100;
-  else if (mode === 3) modeThreshold = 20;
+  else if (mode === 3) modeThreshold = 50;
 
   document.getElementById("mode-info").innerText = modeThreshold;
   document.getElementById("alert").innerText = "🔧 Mode set";
