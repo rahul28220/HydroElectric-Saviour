@@ -1,27 +1,54 @@
 let bluetoothDevice;
 let characteristic;
-let modeThreshold = 200; // Default mode: Road
+let modeThreshold = 200; // Default threshold
 
+// Set EMF detection mode + send command to Arduino
 function setMode(mode) {
   const alertElement = document.getElementById("alert");
+  let modeCommand = "";
 
-  if (mode === 1) {
-    modeThreshold = 200;
-    alertElement.innerText = "🌩️ Road Detection Mode. Threshold: 200";
-  } else if (mode === 2) {
-    modeThreshold = 100;
-    alertElement.innerText = "🚿 Water Heater Mode. Threshold: 100";
-  } else if (mode === 3) {
-    modeThreshold = 50;
-    alertElement.innerText = "🔋 9V Battery Test Mode. Threshold: 50";
-  } else if (mode === 4) {
-    modeThreshold = 60;
-    alertElement.innerText = "🔥 Stoker Mode. Threshold: 60";
+  switch (mode) {
+    case 1:
+      modeThreshold = 200;
+      alertElement.innerText = "🌩️ Road Detection Mode. Threshold: 200";
+      modeCommand = "ROAD";
+      break;
+    case 2:
+      modeThreshold = 100;
+      alertElement.innerText = "🚿 Water Heater Mode. Threshold: 100";
+      modeCommand = "HEATER";
+      break;
+    case 3:
+      modeThreshold = 50;
+      alertElement.innerText = "🔋 9V Battery Test Mode. Threshold: 50";
+      modeCommand = "BATTERY";
+      break;
+    case 4:
+      modeThreshold = 60;
+      alertElement.innerText = "🔥 Socket Mode. Threshold: 60";
+      modeCommand = "SOCKET";
+      break;
+    default:
+      alertElement.innerText = "❓ Unknown Mode";
+      return;
   }
 
   alertElement.className = "neutral";
+
+  // Send command to Arduino via HM-10
+  if (characteristic && modeCommand !== "") {
+    const encoder = new TextEncoder();
+    characteristic.writeValue(encoder.encode(modeCommand + "\n"))
+      .then(() => {
+        console.log("Mode command sent:", modeCommand);
+      })
+      .catch(error => {
+        console.error("Failed to send mode command:", error);
+      });
+  }
 }
 
+// Connect to HM-10 via Web Bluetooth API
 async function connectBluetooth() {
   try {
     bluetoothDevice = await navigator.bluetooth.requestDevice({
@@ -43,14 +70,14 @@ async function connectBluetooth() {
   }
 }
 
+// Handle incoming data from Arduino (EMF reading)
 function handleData(event) {
   const value = new TextDecoder().decode(event.target.value);
   const emf = parseInt(value);
   document.getElementById("reading").innerText = emf;
 
-  if (isNaN(emf)) return;
-
   const alertElement = document.getElementById("alert");
+  if (isNaN(emf)) return;
 
   if (emf > modeThreshold) {
     alertElement.innerText = "⚠️ Danger! Electrified Water Detected!";
@@ -60,4 +87,23 @@ function handleData(event) {
     alertElement.innerText = "✅ Safe";
     alertElement.className = "alert-safe";
   }
+}
+
+// Send command manually via button
+function sendCommand(command) {
+  if (!characteristic) {
+    alert("Bluetooth device not connected.");
+    return;
+  }
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(command + "\n");
+
+  characteristic.writeValue(data)
+    .then(() => {
+      console.log("✅ Command sent:", command);
+    })
+    .catch(error => {
+      console.error("❌ Failed to send command:", error);
+    });
 }
