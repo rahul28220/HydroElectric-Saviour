@@ -1,0 +1,74 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+  color: #333;
+  text-align: center;
+}
+
+.container {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 20px;
+  background-color: #ffffffee;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.buttons, .commands {
+  margin: 20px 0;
+}
+
+.buttons button,
+.commands button {
+  margin: 10px 6px;
+  padding: 12px 18px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.commands h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #0d47a1;
+}
+
+.status p {
+  font-size: 18px;
+  margin: 15px 0;
+}
+
+#alert {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.alert-danger {
+  color: white;
+  background-color: #d32f2f;
+}
+
+.alert-safe {
+  color: white;
+  background-color: #388e3c;
+}
+
+.neutral {
+  background-color: #eeeeee;
+  color: #666;
+}
