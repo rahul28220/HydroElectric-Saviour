@@ -1,27 +1,32 @@
 let bluetoothDevice;
 let characteristic;
-let modeThreshold = 200; // Default mode: Road
+let modeThreshold = 200; // Default threshold
 
 function setMode(mode) {
   const alertElement = document.getElementById("alert");
 
   if (mode === 1) {
     modeThreshold = 200;
-    alertElement.innerText = "🌩️ Road Detection Mode. Threshold: 200";
+    sendMode("ROAD");
+    alertElement.innerText = "🌩 Road Detection Mode – Threshold: 200";
   } else if (mode === 2) {
     modeThreshold = 100;
-    alertElement.innerText = "🚿 Water Heater Mode. Threshold: 100";
+    sendMode("HEATER");
+    alertElement.innerText = "🚿 Water Heater Mode – Threshold: 100";
   } else if (mode === 3) {
     modeThreshold = 50;
-    alertElement.innerText = "🔋 9V Battery Test Mode. Threshold: 50";
+    sendMode("BATTERY");
+    alertElement.innerText = "🔋 9V Battery Test Mode – Threshold: 50";
   } else if (mode === 4) {
     modeThreshold = 60;
-    alertElement.innerText = "🔥 Stoker Mode. Threshold: 60";
+    sendMode("STOKER");
+    alertElement.innerText = "🔥 Socket Mode – Threshold: 60";
   }
 
   alertElement.className = "neutral";
 }
 
+// Connect to HM-10 via Web Bluetooth
 async function connectBluetooth() {
   try {
     bluetoothDevice = await navigator.bluetooth.requestDevice({
@@ -36,33 +41,39 @@ async function connectBluetooth() {
     await characteristic.startNotifications();
     characteristic.addEventListener('characteristicvaluechanged', handleData);
 
-    document.getElementById("status").innerText = "✅ Connected!";
+    document.getElementById("status").innerText = "✅ Connected to Device";
   } catch (error) {
-    console.error("Connection failed:", error);
+    console.error("Bluetooth connection failed:", error);
     document.getElementById("status").innerText = "❌ Connection Failed";
   }
 }
 
+// Send selected mode to Arduino
+function sendMode(modeName) {
+  if (characteristic && bluetoothDevice.gatt.connected) {
+    const encoder = new TextEncoder();
+    characteristic.writeValue(encoder.encode(modeName + "\n"));
+  }
+}
+
+// Handle incoming data from Arduino
 function handleData(event) {
-  const value = new TextDecoder().decode(event.target.value);
+  const value = new TextDecoder().decode(event.target.value).trim();
   const emf = parseInt(value);
-  document.getElementById("reading").innerText = emf;
 
-  if (isNaN(emf)) return;
-
+  const readingSpan = document.getElementById("reading");
   const alertElement = document.getElementById("alert");
 
-  if (emf > modeThreshold) {
-    alertElement.innerText = "⚠️ Danger! Electrified Water Detected!";
-    alertElement.className = "alert-danger";
-    if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-  } else {
-    alertElement.innerText = "✅ Safe";
-    alertElement.className = "alert-safe";
-  }
-  // Send command to Arduino via HM-10
-  if (characteristic && modeCommand !== "") {
-    const encoder = new TextEncoder();
-    characteristic.writeValue(encoder.encode(modeCommand + "\n"));
+  if (!isNaN(emf)) {
+    readingSpan.innerText = emf;
+
+    if (emf >= modeThreshold) {
+      alertElement.innerText = "⚠ DANGER! Electrified Water Detected!";
+      alertElement.className = "alert-danger";
+      if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
+    } else {
+      alertElement.innerText = "✅ Safe: No EMF Hazard";
+      alertElement.className = "alert-safe";
+    }
   }
 }
