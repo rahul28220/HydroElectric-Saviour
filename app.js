@@ -88,4 +88,3 @@ function handleData(event) {
     alertElement.className = "alert-safe";
   }
 }
-}
