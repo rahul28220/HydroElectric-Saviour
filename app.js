@@ -88,22 +88,4 @@ function handleData(event) {
     alertElement.className = "alert-safe";
   }
 }
-
-// Send command manually via button
-function sendCommand(command) {
-  if (!characteristic) {
-    alert("Bluetooth device not connected.");
-    return;
-  }
-
-  const encoder = new TextEncoder();
-  const data = encoder.encode(command + "\n");
-
-  characteristic.writeValue(data)
-    .then(() => {
-      console.log("✅ Command sent:", command);
-    })
-    .catch(error => {
-      console.error("❌ Failed to send command:", error);
-    });
 }
