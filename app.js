@@ -60,4 +60,9 @@ function handleData(event) {
     alertElement.innerText = "✅ Safe";
     alertElement.className = "alert-safe";
   }
+  // Send command to Arduino via HM-10
+  if (characteristic && modeCommand !== "") {
+    const encoder = new TextEncoder();
+    characteristic.writeValue(encoder.encode(modeCommand + "\n"));
+  }
 }
